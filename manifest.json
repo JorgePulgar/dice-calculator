@@ -4,7 +4,7 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#1e1e1e",
-  "theme_color": "#3a6ea5",
+  "theme_color": "#561E2B",
   "description": "Calculadora de dados para juegos de rol.",
   "icons": [
     {
