@@ -5,7 +5,8 @@ const FILES_TO_CACHE = [
   '/manifest.json',
   '/service-worker.js',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/Wallpaper.jpeg'
 ];
 
 self.addEventListener('install', (evt) => {
