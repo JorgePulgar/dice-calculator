@@ -2,9 +2,10 @@
 <html lang="es">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#561E2B" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#561E2B">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#561E2B">
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>La Calculadora del Dragón</title>
     <link rel="manifest" href="manifest.json" />
@@ -13,7 +14,7 @@
     <style>
         body {
             font-family: sans-serif;
-            background: #561E2B ;
+            background: #561E2B;
             color: #eee;
             display: flex;
             flex-direction: column;
@@ -90,10 +91,11 @@
             max-height: 50vh;
             overflow-y: auto;
         }
-        
+
         .buttons #C {
             grid-column: span 3;
         }
+
         .buttons #erase {
             grid-column: span 2;
         }
@@ -209,8 +211,8 @@
             <button onclick="addInput('-')">-</button>
             <button onclick="addInput('d100')">d100</button>
             <button onclick="rollDice()">=</button>
-            
-            
+
+
         </div>
 
         <div class="history-overlay" id="history">
