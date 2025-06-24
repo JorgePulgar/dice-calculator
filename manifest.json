@@ -3,7 +3,7 @@
   "short_name": "Calculadora Dragón",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#1e1e1e",
+  "background_color": "#561E2B",
   "theme_color": "#561E2B",
   "description": "Calculadora de dados para juegos de rol.",
   "icons": [
