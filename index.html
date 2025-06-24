@@ -19,10 +19,14 @@
             align-items: center;
             margin: 0;
             height: 100vh;
+            background-image: url('wallpaper.jpeg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
         }
 
         .calculator {
-            background: #1e1e1e;
+            /*background: #1e1e1e;*/
             padding: 20px;
             width: 90%;
             position: relative;
@@ -34,7 +38,7 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             margin-bottom: 10px;
         }
@@ -42,16 +46,18 @@
         .title {
             font-size: 1.3rem;
             font-weight: bold;
-            color: #eee;
+            color: #F5DDAF;
+            background-color: #561E2B;
+            box-shadow: #000 0 5px 10px rgba(0, 0, 0, 0.5);
         }
 
         .history-toggle {
-            background: #444;
+            background: #561E2B;
             padding: 6px 12px;
             font-size: 1rem;
             border: none;
             border-radius: 5px;
-            color: #eee;
+            color: #F5DDAF;
             cursor: pointer;
             user-select: none;
             transition: background 0.3s;
@@ -63,9 +69,9 @@
 
         .display {
             background: #2a2a2a;
+            opacity: 0.9;
             border-radius: 5px;
             padding: 12px;
-
             margin-bottom: 15px;
             font-size: 1.2rem;
             white-space: pre-wrap;
@@ -83,14 +89,21 @@
             max-height: 50vh;
             overflow-y: auto;
         }
+        
+        .buttons #C {
+            grid-column: span 3;
+        }
+        .buttons #erase {
+            grid-column: span 2;
+        }
 
         button {
             padding: 15px 0;
             font-size: 1.1rem;
             border: none;
             border-radius: 5px;
-            background: #3a6ea5;
-            color: white;
+            background: #561E2B;
+            color: #F5DDAF;
             cursor: pointer;
             user-select: none;
             transition: background 0.3s;
@@ -98,15 +111,15 @@
         }
 
         button:hover {
-            background: #2e5680;
+            background: #3c151f;
         }
 
         .history-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: #121212;
             z-index: 20;
             display: none;
@@ -117,6 +130,7 @@
             color: #ddd;
             box-shadow: inset 0 0 10px #000;
         }
+
 
         .history-overlay.visible {
             display: flex;
@@ -162,11 +176,15 @@
 <body>
     <div class="calculator">
         <div class="header">
-            <div class="title">La Calculadora del Dragón</div>
+            <!-- de momento le quito el título porque no me convence 
+            <div class="title">La Calculadora del Xanathar</div> -->
             <button class="history-toggle" onclick="toggleHistory()">Historial</button>
         </div>
         <div class="display" id="display"></div>
         <div class="buttons">
+            <button onclick="clearDisplay()" id="C">C</button>
+            <button onclick="backspace()" id="erase">⌫</button>
+
             <button onclick="addInput('7')">7</button>
             <button onclick="addInput('8')">8</button>
             <button onclick="addInput('9')">9</button>
@@ -185,11 +203,13 @@
             <button onclick="addInput('d8')">d8</button>
             <button onclick="addInput('d20')">d20</button>
 
-            <button onclick="addInput('0')">0</button>
             <button onclick="addInput('+')">+</button>
-            <button onclick="clearDisplay()">C</button>
-            <button onclick="rollDice()">=</button>
+            <button onclick="addInput('0')">0</button>
+            <button onclick="addInput('-')">-</button>
             <button onclick="addInput('d100')">d100</button>
+            <button onclick="rollDice()">=</button>
+            
+            
         </div>
 
         <div class="history-overlay" id="history">
@@ -206,22 +226,35 @@
 
     <script>
         let expression = '';
+        let lastTotal = null;
+
         const display = document.getElementById('display');
         const historyOverlay = document.getElementById('history');
         const historyEntries = document.getElementById('history-entries');
 
         function addInput(val) {
-            if (val === '+') {
-                if (expression === '' || expression.endsWith('+')) return;
+            if ((val === '+' || val === '-') && (expression === '' || /[+\-]$/.test(expression))) {
+                if (lastTotal !== null && expression === '') {
+                    expression = lastTotal.toString();
+                }
             }
+
+            if ((val === '+' || val === '-') && (expression === '' || /[+\-]$/.test(expression))) {
+                return;
+            }
+
             if (val.startsWith('d')) {
-                if (!/\d$/.test(expression)) return;
-                expression += val;
+                if (expression === '' || /[+\-]$/.test(expression)) {
+                    expression += '1' + val;
+                } else {
+                    expression += val;
+                }
             } else {
                 expression += val;
             }
             updateDisplay(expression);
         }
+
 
         function clearDisplay() {
             expression = '';
@@ -232,9 +265,23 @@
             display.textContent = content;
         }
 
+        function backspace() {
+            if (expression.length === 0) return;
+
+            const match = expression.match(/d\d+$/);
+            if (match) {
+                expression = expression.slice(0, -match[0].length);
+            } else {
+                expression = expression.slice(0, -1);
+            }
+
+            updateDisplay(expression);
+        }
+
+
         function rollDice() {
             if (!expression) return;
-            const tokens = expression.match(/(\d*d\d+|\d+|\+)/g);
+            const tokens = expression.match(/(\d*d\d+|\d+|[+\-])/g);
             if (!tokens) return;
 
             let total = 0;
@@ -244,6 +291,8 @@
             for (let token of tokens) {
                 if (token === '+') {
                     sign = 1;
+                } else if (token === '-') {
+                    sign = -1;
                 } else {
                     const match = token.match(/(\d*)d(\d+)/);
                     if (match) {
@@ -257,18 +306,28 @@
                             subtotal += roll;
                         }
                         total += sign * subtotal;
-                        details.push(`${count}d${sides}(${rolls.join(', ')})`);
+                        details.push(`${sign === -1 ? '-' : ''}${count}d${sides}(${rolls.join(', ')})`);
                     } else if (!isNaN(token)) {
                         total += sign * parseInt(token);
-                        details.push(token);
+                        details.push(`${sign === -1 ? '-' : ''}${token}`);
                     }
                 }
             }
 
-            const result = `${details.join(' + ')} = ${total}`;
+            const result = `${details.map((d, i) => {
+                if (i === 0) {
+                    return d;  // el primero tal cual
+                } else if (d.startsWith('-')) {
+                    return `- ${d.slice(1)}`;  // ya empieza con -, dejamos el signo claro
+                } else {
+                    return `+ ${d}`;  // añadimos +
+                }
+            }).join(' ')} = ${total}`;
+
             updateDisplay(result);
             addToHistory(result);
             expression = '';
+            lastTotal = total;
         }
 
         function addToHistory(text) {
